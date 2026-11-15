@@ -4,6 +4,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 function verificarSessao(req) {
   try {
     const cookie = req.headers.cookie || "";
+
     const token = cookie
       .split("; ")
       .find(item => item.startsWith("ozen_session="))
@@ -11,10 +12,15 @@ function verificarSessao(req) {
       .slice(1)
       .join("=");
 
-    if (!token || !process.env.OZEN_SESSION_SECRET) return false;
+    if (!token || !process.env.OZEN_SESSION_SECRET) {
+      return false;
+    }
 
     const [payload, assinatura] = token.split(".");
-    if (!payload || !assinatura) return false;
+
+    if (!payload || !assinatura) {
+      return false;
+    }
 
     const esperada = createHmac(
       "sha256",
@@ -33,51 +39,124 @@ function verificarSessao(req) {
     );
 
     return dados.expires > Date.now();
+
   } catch {
     return false;
   }
 }
 
 export default async function handler(req, res) {
+
+  // Verificar método
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método não permitido." });
+    return res.status(405).json({
+      error: "Método não permitido."
+    });
+  }
+
+  // Proteger a API com a sessão
+  if (!verificarSessao(req)) {
+    return res.status(401).json({
+      error: "Sessão expirada. Entre novamente."
+    });
   }
 
   const message = req.body?.message;
+  const history = req.body?.history;
 
   if (typeof message !== "string" || !message.trim()) {
-    return res.status(400).json({ error: "Digite uma mensagem." });
+    return res.status(400).json({
+      error: "Digite uma mensagem."
+    });
+  }
+
+  if (message.length > 10000) {
+    return res.status(400).json({
+      error: "Mensagem muito grande."
+    });
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: "Chave Gemini não configurada." });
+    return res.status(500).json({
+      error: "Chave Gemini não configurada."
+    });
   }
 
+  // Preparar histórico da conversa
+  const mensagensAnteriores = Array.isArray(history)
+    ? history.slice(-20).filter(item => {
+        return (
+          item &&
+          ["user", "model"].includes(item.role) &&
+          typeof item.text === "string"
+        );
+      }).map(item => ({
+        role: item.role,
+        parts: [{
+          text: item.text.slice(0, 5000)
+        }]
+      }))
+    : [];
+
+  // Adicionar mensagem atual
+  const contents = [
+    ...mensagensAnteriores,
+    {
+      role: "user",
+      parts: [{ text: message.trim() }]
+    }
+  ];
+
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, 25000);
 
   try {
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
           "x-goog-api-key": apiKey
         },
+
         body: JSON.stringify({
           systemInstruction: {
             parts: [{
-              text: "Você é OZEN, uma IA pessoal inteligente. Fale português brasileiro. Seja amigável, prestativa e objetiva."
+              text: `
+Você é OZEN, uma inteligência artificial pessoal.
+
+Sua identidade:
+- Seu nome é OZEN.
+- Seu usuário é Enzo.
+- Fale sempre em português brasileiro.
+- Seja inteligente, amigável, natural e objetiva.
+- Converse como uma assistente pessoal, não como um robô.
+- Considere o histórico enviado para manter o contexto da conversa.
+- Não invente informações sobre o usuário.
+- Quando não souber algo, seja transparente.
+- Ajude com estudos, projetos, tecnologia, organização e tarefas do dia a dia.
+- Use emojis moderadamente quando combinarem com a conversa.
+
+Seu objetivo é ajudar Enzo de maneira útil e personalizada.
+              `
             }]
           },
-          contents: [{
-            role: "user",
-            parts: [{ text: message.trim() }]
-          }]
+
+          contents,
+
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 2048
+          }
         }),
+
         signal: controller.signal
       }
     );
@@ -87,7 +166,9 @@ export default async function handler(req, res) {
     if (!response.ok) {
       console.error("Gemini status:", response.status, data);
 
-      return res.status(response.status === 503 ? 503 : 502).json({
+      return res.status(
+        response.status === 503 ? 503 : 502
+      ).json({
         error: response.status === 503
           ? "O Gemini está temporariamente ocupado. Tente novamente."
           : "Falha na conexão com o Gemini.",
@@ -96,7 +177,7 @@ export default async function handler(req, res) {
     }
 
     const answer = data.candidates?.[0]?.content?.parts
-      ?.map(p => p.text || "")
+      ?.map(part => part.text || "")
       .join("");
 
     if (!answer) {
@@ -113,6 +194,7 @@ export default async function handler(req, res) {
     return res.status(504).json({
       error: "A conexão demorou demais. Tente novamente."
     });
+
   } finally {
     clearTimeout(timeout);
   }
