@@ -119,7 +119,22 @@
     <button id="sendButton">Enviar</button>
   </footer>
 
-  <script>
+  <script> 
+(async function protegerPagina() {
+  try {
+    const resposta = await fetch("/api/session", {
+      cache: "no-store"
+    });
+
+    if (!resposta.ok) {
+      window.location.replace("/");
+      return;
+    }
+  } catch {
+    window.location.replace("/");
+  }
+})();
+    
     const messages = document.getElementById("messages");
     const input = document.getElementById("messageInput");
     const button = document.getElementById("sendButton");
