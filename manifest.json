@@ -1,0 +1,20 @@
+
+{
+  "name": "OZEN AI",
+  "short_name": "OZEN",
+  "description": "Assistente pessoal criada e desenvolvida por Enzo Brandão.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050b18",
+  "theme_color": "#087cf0",
+  "icons": [
+    {
+      "src": "/ozen.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
