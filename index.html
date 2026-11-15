@@ -96,15 +96,51 @@
     </div>
     <div id="response"></div>
   </main>
-  <script>
-    function sendMessage() {
-      const input = document.getElementById("message");
-      const response = document.getElementById("response");
-      if (!input.value.trim()) return;
-      response.textContent =
-        "Olá! Sou a OZEN. Minha conexão com o cérebro de IA será ativada na próxima etapa.";
-      input.value = "";
+  
+<script>
+async function sendMessage() {
+  const input = document.getElementById("message");
+  const response = document.getElementById("response");
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  input.disabled = true;
+  response.textContent = "OZEN está pensando...";
+
+  try {
+    const result = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await result.json();
+
+    if (!result.ok) {
+      throw new Error(data.error || "Erro na conexão.");
     }
-  </script>
+
+    response.textContent = data.answer;
+    input.value = "";
+
+  } catch (error) {
+    response.textContent =
+      "Não consegui responder. Verifique a conexão e tente novamente.";
+    console.error(error);
+  } finally {
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+document.getElementById("message")
+  .addEventListener("keydown", function(event) {
+    if (event.key === "Enter") sendMessage();
+  });
+</script>
+
 </body>
 </html>
