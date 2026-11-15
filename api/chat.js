@@ -1,4 +1,43 @@
 
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+function verificarSessao(req) {
+  try {
+    const cookie = req.headers.cookie || "";
+    const token = cookie
+      .split("; ")
+      .find(item => item.startsWith("ozen_session="))
+      ?.split("=")
+      .slice(1)
+      .join("=");
+
+    if (!token || !process.env.OZEN_SESSION_SECRET) return false;
+
+    const [payload, assinatura] = token.split(".");
+    if (!payload || !assinatura) return false;
+
+    const esperada = createHmac(
+      "sha256",
+      process.env.OZEN_SESSION_SECRET
+    ).update(payload).digest("base64url");
+
+    const a = Buffer.from(assinatura);
+    const b = Buffer.from(esperada);
+
+    if (a.length !== b.length || !timingSafeEqual(a, b)) {
+      return false;
+    }
+
+    const dados = JSON.parse(
+      Buffer.from(payload, "base64url").toString()
+    );
+
+    return dados.expires > Date.now();
+  } catch {
+    return false;
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido." });
