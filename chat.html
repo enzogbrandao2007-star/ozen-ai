@@ -6,13 +6,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OZEN AI</title>
 
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#06152b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OZEN AI">
+<link rel="icon" type="image/png" href="/ozen.png">
+<link rel="apple-touch-icon" href="/ozen.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -26,8 +32,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-/* CABEÇALHO */
 
 header {
   height: 76px;
@@ -89,8 +93,6 @@ header {
   box-shadow: 0 0 8px #35e6a0;
 }
 
-/* ÁREA DAS MENSAGENS */
-
 #messages {
   flex: 1;
   width: 100%;
@@ -100,6 +102,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  overflow-y: auto;
 }
 
 .welcome {
@@ -130,13 +133,8 @@ header {
   animation: appear .25s ease;
 }
 
-.message.user {
-  align-self: flex-end;
-}
-
-.message.ozen {
-  align-self: flex-start;
-}
+.message.user { align-self: flex-end; }
+.message.ozen { align-self: flex-start; }
 
 .message-label {
   font-size: 10px;
@@ -173,8 +171,6 @@ header {
   color: #e5efff;
 }
 
-/* DIGITANDO */
-
 .typing {
   display: none;
   align-self: flex-start;
@@ -193,15 +189,8 @@ header {
   animation: bounce 1s infinite;
 }
 
-.typing span:nth-child(2) {
-  animation-delay: .15s;
-}
-
-.typing span:nth-child(3) {
-  animation-delay: .3s;
-}
-
-/* ÁREA DE ENVIO */
+.typing span:nth-child(2) { animation-delay: .15s; }
+.typing span:nth-child(3) { animation-delay: .3s; }
 
 footer {
   position: sticky;
@@ -242,9 +231,7 @@ footer {
   padding: 12px 0;
 }
 
-#userInput::placeholder {
-  color: #7589a8;
-}
+#userInput::placeholder { color: #7589a8; }
 
 #sendButton {
   width: 43px;
@@ -260,9 +247,7 @@ footer {
   transition: .2s;
 }
 
-#sendButton:active {
-  transform: scale(.92);
-}
+#sendButton:active { transform: scale(.92); }
 
 #sendButton:disabled {
   opacity: .5;
@@ -271,7 +256,7 @@ footer {
 
 .footer-note {
   text-align: center;
-  color: #536987;
+  color: #7186a5;
   font-size: 10px;
   margin-top: 10px;
 }
@@ -287,27 +272,11 @@ footer {
 }
 
 @media (max-width: 500px) {
-  header {
-    height: 68px;
-    padding: 0 15px;
-  }
-
-  .logo {
-    width: 43px;
-    height: 43px;
-  }
-
-  #messages {
-    padding: 20px 13px;
-  }
-
-  .message {
-    max-width: 91%;
-  }
-
-  .welcome h2 {
-    font-size: 25px;
-  }
+  header { height: 68px; padding: 0 15px; }
+  .logo { width: 43px; height: 43px; }
+  #messages { padding: 20px 13px; }
+  .message { max-width: 91%; }
+  .welcome h2 { font-size: 25px; }
 }
 </style>
 </head>
@@ -333,9 +302,7 @@ footer {
   </div>
 
   <div class="typing" id="typing">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </div>
 </main>
 
@@ -347,12 +314,11 @@ footer {
       placeholder="Converse com a OZEN..."
       autocomplete="off"
     >
-
     <button id="sendButton" onclick="sendMessage()">➤</button>
   </div>
 
   <div class="footer-note">
-    OZEN AI · Sua inteligência artificial pessoal
+    OZEN AI · Criada e desenvolvida por Enzo Brandão
   </div>
 </footer>
 
@@ -418,7 +384,6 @@ async function sendMessage() {
   sendButton.disabled = true;
 
   addMessage(message, "user");
-
   input.value = "";
   typing.style.display = "flex";
   messages.scrollTop = messages.scrollHeight;
@@ -447,15 +412,8 @@ async function sendMessage() {
       throw new Error("A OZEN não retornou uma resposta.");
     }
 
-    history.push({
-      role: "user",
-      text: message
-    });
-
-    history.push({
-      role: "model",
-      text: answer
-    });
+    history.push({ role: "user", text: message });
+    history.push({ role: "model", text: answer });
 
     addMessage(answer, "ozen");
 
@@ -482,6 +440,17 @@ input.addEventListener("keydown", function(event) {
     sendMessage();
   }
 });
+
+/* PREPARAR A OZEN COMO APLICATIVO */
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/sw.js")
+      .catch(function(error) {
+        console.error("Erro ao registrar aplicativo:", error);
+      });
+  });
+}
 </script>
 
 </body>
