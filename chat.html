@@ -35,8 +35,6 @@ body {
   isolation: isolate;
 }
 
-/* VÍDEO DE FUNDO */
-
 #backgroundVideo {
   position: fixed;
   inset: 0;
@@ -46,8 +44,6 @@ body {
   z-index: -2;
   pointer-events: none;
 }
-
-/* SEM CAMADA SOBRE O VÍDEO */
 
 body::before {
   display: none;
@@ -198,7 +194,6 @@ header {
   border: 1px solid rgba(91,151,231,.25);
   border-bottom-left-radius: 5px;
   color: #e5efff;
-  backdrop-filter: blur(8px);
 }
 
 .typing {
@@ -240,7 +235,7 @@ footer {
   margin: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   padding: 7px 8px 7px 17px;
   border-radius: 18px;
   background: rgba(16,31,56,.91);
@@ -269,21 +264,38 @@ footer {
   color: #a0b2ce;
 }
 
-#sendButton {
+#sendButton,
+#micButton {
   width: 43px;
   height: 43px;
+  flex-shrink: 0;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, #168cff, #0756d9);
   color: white;
-  font-size: 20px;
+  font-size: 19px;
   cursor: pointer;
   display: grid;
   place-items: center;
   transition: .2s;
 }
 
-#sendButton:active {
+#sendButton {
+  background: linear-gradient(135deg, #168cff, #0756d9);
+}
+
+#micButton {
+  background: rgba(50,100,160,.55);
+  border: 1px solid rgba(100,170,255,.35);
+}
+
+#micButton.listening {
+  background: #e53e55;
+  box-shadow: 0 0 18px rgba(229,62,85,.5);
+  animation: pulse 1.2s infinite;
+}
+
+#sendButton:active,
+#micButton:active {
   transform: scale(.92);
 }
 
@@ -292,11 +304,20 @@ footer {
   cursor: not-allowed;
 }
 
+.voice-status {
+  text-align: center;
+  color: #b8d9ff;
+  font-size: 11px;
+  min-height: 16px;
+  margin-top: 8px;
+  text-shadow: 0 2px 5px #000;
+}
+
 .footer-note {
   text-align: center;
   color: #fff;
   font-size: 10px;
-  margin-top: 10px;
+  margin-top: 7px;
   text-shadow: 0 2px 5px #000;
 }
 
@@ -312,12 +333,13 @@ footer {
 }
 
 @keyframes bounce {
-  0%, 60%, 100% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-5px);
-  }
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
 }
 
 @media (max-width: 500px) {
@@ -348,8 +370,6 @@ footer {
 
 <body>
 
-<!-- VÍDEO ORIGINAL DO LOGIN -->
-
 <video id="backgroundVideo" autoplay muted loop playsinline>
   <source src="/fundo2.mp4" type="video/mp4">
 </video>
@@ -361,7 +381,7 @@ footer {
 
   <div class="header-info">
     <h1>OZEN</h1>
-    <div class="status">Online</div>
+    <div class="status" id="onlineStatus">Online</div>
   </div>
 </header>
 
@@ -387,7 +407,18 @@ footer {
       placeholder="Converse com a OZEN..."
       autocomplete="off"
     >
-    <button id="sendButton" onclick="sendMessage()">➤</button>
+
+    <button id="micButton" type="button" aria-label="Falar com a OZEN" title="Falar">
+      🎙️
+    </button>
+
+    <button id="sendButton" type="button" onclick="sendMessage()">
+      ➤
+    </button>
+  </div>
+
+  <div class="voice-status" id="voiceStatus">
+    Toque no microfone para falar
   </div>
 
   <div class="footer-note">
@@ -399,11 +430,15 @@ footer {
 const messages = document.getElementById("messages");
 const input = document.getElementById("userInput");
 const sendButton = document.getElementById("sendButton");
+const micButton = document.getElementById("micButton");
 const typing = document.getElementById("typing");
 const welcome = document.getElementById("welcome");
+const voiceStatus = document.getElementById("voiceStatus");
 
 const history = [];
 let sending = false;
+let recognition = null;
+let listening = false;
 
 /* VERIFICAR LOGIN */
 
@@ -446,19 +481,164 @@ function addMessage(text, type) {
   messages.scrollTop = messages.scrollHeight;
 }
 
+/* RESPOSTA FALADA DA OZEN */
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) {
+    voiceStatus.textContent = "Áudio não disponível neste navegador.";
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "pt-BR";
+  utterance.rate = 1;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  utterance.onstart = function() {
+    voiceStatus.textContent = "OZEN está falando...";
+  };
+
+  utterance.onend = function() {
+    if (!listening) {
+      voiceStatus.textContent = "Toque no microfone para falar";
+    }
+  };
+
+  utterance.onerror = function() {
+    voiceStatus.textContent = "Não foi possível reproduzir a voz.";
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+/* PARAR A VOZ */
+
+function stopSpeaking() {
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+/* RECONHECIMENTO DE VOZ */
+
+function setupVoice() {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    micButton.disabled = true;
+    micButton.style.opacity = ".4";
+    voiceStatus.textContent =
+      "Reconhecimento de voz não disponível neste navegador.";
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = "pt-BR";
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = function() {
+    listening = true;
+    micButton.classList.add("listening");
+    micButton.textContent = "⏹";
+    voiceStatus.textContent = "Estou ouvindo você, Enzo...";
+    stopSpeaking();
+  };
+
+  recognition.onresult = function(event) {
+    let finalText = "";
+    let interimText = "";
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+
+      if (event.results[i].isFinal) {
+        finalText += transcript;
+      } else {
+        interimText += transcript;
+      }
+    }
+
+    if (interimText) {
+      voiceStatus.textContent = "Ouvindo: " + interimText;
+    }
+
+    if (finalText.trim()) {
+      input.value = finalText.trim();
+    }
+  };
+
+  recognition.onerror = function(event) {
+    listening = false;
+    micButton.classList.remove("listening");
+    micButton.textContent = "🎙️";
+
+    if (event.error === "not-allowed") {
+      voiceStatus.textContent =
+        "Permita o acesso ao microfone nas configurações do navegador.";
+    } else if (event.error === "no-speech") {
+      voiceStatus.textContent = "Não ouvi sua voz. Tente novamente.";
+    } else {
+      voiceStatus.textContent = "Erro no microfone. Tente novamente.";
+    }
+  };
+
+  recognition.onend = function() {
+    listening = false;
+    micButton.classList.remove("listening");
+    micButton.textContent = "🎙️";
+
+    if (input.value.trim() && !sending) {
+      sendMessage(true);
+    } else {
+      voiceStatus.textContent = "Toque no microfone para falar";
+    }
+  };
+}
+
+/* LIGAR E DESLIGAR MICROFONE */
+
+micButton.addEventListener("click", function() {
+  if (!recognition) {
+    setupVoice();
+  }
+
+  if (!recognition) return;
+
+  if (listening) {
+    recognition.stop();
+  } else {
+    stopSpeaking();
+
+    try {
+      recognition.start();
+    } catch (error) {
+      voiceStatus.textContent =
+        "Aguarde um instante e tente novamente.";
+    }
+  }
+});
+
 /* ENVIAR MENSAGEM */
 
-async function sendMessage() {
+async function sendMessage(fromVoice = false) {
   const message = input.value.trim();
 
   if (!message || sending) return;
 
   sending = true;
   sendButton.disabled = true;
+  micButton.disabled = true;
 
   addMessage(message, "user");
   input.value = "";
   typing.style.display = "flex";
+  voiceStatus.textContent = "A OZEN está pensando...";
   messages.scrollTop = messages.scrollHeight;
 
   try {
@@ -490,6 +670,10 @@ async function sendMessage() {
 
     addMessage(answer, "ozen");
 
+    /* A OZEN FALA A RESPOSTA */
+
+    speak(answer);
+
   } catch (error) {
     addMessage(
       "Desculpe, Enzo. Tive um problema ao responder. Tente novamente daqui a pouco.",
@@ -502,6 +686,7 @@ async function sendMessage() {
     typing.style.display = "none";
     sending = false;
     sendButton.disabled = false;
+    micButton.disabled = false;
     input.focus();
   }
 }
@@ -524,6 +709,10 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+
+/* INICIAR RECURSOS DE VOZ */
+
+setupVoice();
 </script>
 
 </body>
