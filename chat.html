@@ -2,462 +2,487 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#06152b">
-  <title>OZEN — Sua IA pessoal</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OZEN AI</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      height: 100vh;
-      height: 100dvh;
-      background:
-        radial-gradient(ellipse at top, #12365b 0%, transparent 55%),
-        #06152b;
-      color: white;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 50% 0%, #102b58 0%, transparent 40%),
+    linear-gradient(145deg, #050b18, #08152b 55%, #050b18);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
 
-    header {
-      min-height: 78px;
-      padding: 13px 18px;
-      background: rgba(8, 29, 55, 0.92);
-      border-bottom: 1px solid rgba(70, 160, 230, 0.25);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 5px 25px #0003;
-      z-index: 2;
-    }
+/* CABEÇALHO */
 
-    .logo {
-      width: 46px;
-      height: 46px;
-      flex-shrink: 0;
-      border-radius: 15px;
-      background: linear-gradient(135deg,#087ce5,#53c4ff);
-      display: grid;
-      place-items: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: bold;
-      font-size: 24px;
-      box-shadow: 0 0 22px #1689ee66;
-    }
+header {
+  height: 76px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border-bottom: 1px solid rgba(100,160,255,.13);
+  background: rgba(5,13,29,.75);
+  backdrop-filter: blur(18px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-    .brand {
-      flex: 1;
-    }
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #168cff;
+  box-shadow: 0 0 18px rgba(0,132,255,.35);
+}
 
-    header strong {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 21px;
-      letter-spacing: 1px;
-    }
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-    header small {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #a9d9ff;
-      margin-top: 4px;
-      font-size: 11px;
-    }
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-    .online-dot {
-      width: 7px;
-      height: 7px;
-      background: #39e69b;
-      border-radius: 50%;
-      box-shadow: 0 0 9px #39e69b;
-    }
+.header-info h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 19px;
+  margin: 0;
+  letter-spacing: 1px;
+}
 
-    .header-tag {
-      border: 1px solid #28659a;
-      background: #102e4c;
-      color: #8bcaff;
-      padding: 7px 10px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: bold;
-    }
+.status {
+  font-size: 11px;
+  color: #48dba0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-    #messages {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      padding: 22px 15px 25px;
-      display: flex;
-      flex-direction: column;
-      gap: 17px;
-      scroll-behavior: smooth;
-    }
+.status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #35e6a0;
+  box-shadow: 0 0 8px #35e6a0;
+}
 
-    #messages::-webkit-scrollbar {
-      width: 5px;
-    }
+/* ÁREA DAS MENSAGENS */
 
-    #messages::-webkit-scrollbar-thumb {
-      background: #24517a;
-      border-radius: 10px;
-    }
+#messages {
+  flex: 1;
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 25px 18px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
-    .welcome {
-      text-align: center;
-      margin: 18px 0 12px;
-      color: #b6d9ff;
-      font-size: 12px;
-    }
+.welcome {
+  text-align: center;
+  margin: auto 0;
+  padding: 30px 15px;
+}
 
-    .welcome-icon {
-      width: 58px;
-      height: 58px;
-      margin: 0 auto 12px;
-      border-radius: 19px;
-      background: linear-gradient(135deg,#087ce5,#53c4ff);
-      display: grid;
-      place-items: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 30px;
-      font-weight: bold;
-      color: white;
-      box-shadow: 0 0 30px #1689ee55;
-    }
+.welcome h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #fff, #58b5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-    .message {
-      max-width: 88%;
-      padding: 14px 16px;
-      border-radius: 18px;
-      line-height: 1.6;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-      animation: appear .25s ease;
-    }
+.welcome p {
+  color: #8ea5c8;
+  font-size: 14px;
+  line-height: 1.6;
+}
 
-    .bot {
-      align-self: flex-start;
-      background: linear-gradient(145deg,#153454,#102943);
-      border: 1px solid #24517a;
-      border-bottom-left-radius: 5px;
-      box-shadow: 0 5px 20px #0002;
-    }
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+  animation: appear .25s ease;
+}
 
-    .user {
-      align-self: flex-end;
-      background: linear-gradient(135deg,#087bd1,#1264b5);
-      border: 1px solid #359de9;
-      border-bottom-right-radius: 5px;
-      box-shadow: 0 5px 20px #087bd133;
-    }
+.message.user {
+  align-self: flex-end;
+}
 
-    .message-label {
-      display: block;
-      font-size: 10px;
-      font-weight: bold;
-      color: #81c9ff;
-      margin-bottom: 6px;
-      letter-spacing: .5px;
-    }
+.message.ozen {
+  align-self: flex-start;
+}
 
-    .user .message-label {
-      color: #d2ebff;
-    }
+.message-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #78baff;
+  margin: 0 8px 7px;
+}
 
-    .typing {
-      align-self: flex-start;
-      padding: 15px 18px;
-      background: #153454;
-      border: 1px solid #24517a;
-      border-radius: 17px;
-      display: flex;
-      gap: 5px;
-    }
+.message.user .message-label {
+  text-align: right;
+  color: #a6b9d6;
+}
 
-    .typing span {
-      width: 7px;
-      height: 7px;
-      background: #69c6ff;
-      border-radius: 50%;
-      animation: typing 1s infinite alternate;
-    }
+.bubble {
+  padding: 14px 17px;
+  border-radius: 17px;
+  font-size: 14px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 
-    .typing span:nth-child(2) {
-      animation-delay: .2s;
-    }
+.user .bubble {
+  background: linear-gradient(135deg, #087cf0, #1453bb);
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 5px 20px rgba(0,105,255,.16);
+}
 
-    .typing span:nth-child(3) {
-      animation-delay: .4s;
-    }
+.ozen .bubble {
+  background: rgba(20,39,70,.85);
+  border: 1px solid rgba(91,151,231,.16);
+  border-bottom-left-radius: 5px;
+  color: #e5efff;
+}
 
-    footer {
-      padding: 13px;
-      padding-bottom: max(13px, env(safe-area-inset-bottom));
-      background: rgba(8, 29, 55, 0.97);
-      border-top: 1px solid rgba(70, 160, 230, 0.25);
-      display: flex;
-      gap: 9px;
-      align-items: center;
-    }
+/* DIGITANDO */
 
-    input {
-      flex: 1;
-      min-width: 0;
-      padding: 15px 16px;
-      border: 1px solid #24517a;
-      border-radius: 15px;
-      background: #102a48;
-      color: white;
-      outline: none;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      transition: .2s;
-    }
+.typing {
+  display: none;
+  align-self: flex-start;
+  padding: 14px 17px;
+  background: rgba(20,39,70,.85);
+  border: 1px solid rgba(91,151,231,.16);
+  border-radius: 16px;
+  gap: 5px;
+}
 
-    input:focus {
-      border-color: #39aaff;
-      box-shadow: 0 0 14px #1689ee33;
-    }
+.typing span {
+  width: 6px;
+  height: 6px;
+  background: #54aaff;
+  border-radius: 50%;
+  animation: bounce 1s infinite;
+}
 
-    input::placeholder {
-      color: #8ba8c4;
-    }
+.typing span:nth-child(2) {
+  animation-delay: .15s;
+}
 
-    button {
-      width: 52px;
-      height: 50px;
-      flex-shrink: 0;
-      border: 1px solid #53bdff;
-      border-radius: 15px;
-      background: linear-gradient(135deg,#087ce5,#36b3ff);
-      color: white;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      box-shadow: 0 0 16px #1689ee44;
-      transition: .2s;
-    }
+.typing span:nth-child(3) {
+  animation-delay: .3s;
+}
 
-    button:active {
-      transform: scale(.94);
-    }
+/* ÁREA DE ENVIO */
 
-    button:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
+footer {
+  position: sticky;
+  bottom: 0;
+  padding: 15px 16px calc(15px + env(safe-area-inset-bottom));
+  background: rgba(5,13,29,.88);
+  border-top: 1px solid rgba(100,160,255,.13);
+  backdrop-filter: blur(18px);
+}
 
-    button svg {
-      width: 22px;
-      height: 22px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
+.input-area {
+  max-width: 850px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px 7px 17px;
+  border-radius: 18px;
+  background: #101f38;
+  border: 1px solid rgba(85,153,255,.25);
+  transition: .2s;
+}
 
-    .footer-note {
-      background: rgba(8, 29, 55, 0.97);
-      color: #7598b9;
-      text-align: center;
-      font-size: 10px;
-      padding: 0 10px 9px;
-    }
+.input-area:focus-within {
+  border-color: #168cff;
+  box-shadow: 0 0 18px rgba(0,132,255,.12);
+}
 
-    @keyframes appear {
-      from {
-        opacity: 0;
-        transform: translateY(7px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+#userInput {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 12px 0;
+}
 
-    @keyframes typing {
-      from {
-        opacity: .35;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(-5px);
-      }
-    }
-  </style>
+#userInput::placeholder {
+  color: #7589a8;
+}
+
+#sendButton {
+  width: 43px;
+  height: 43px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #168cff, #0756d9);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: .2s;
+}
+
+#sendButton:active {
+  transform: scale(.92);
+}
+
+#sendButton:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.footer-note {
+  text-align: center;
+  color: #536987;
+  font-size: 10px;
+  margin-top: 10px;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
+@media (max-width: 500px) {
+  header {
+    height: 68px;
+    padding: 0 15px;
+  }
+
+  .logo {
+    width: 43px;
+    height: 43px;
+  }
+
+  #messages {
+    padding: 20px 13px;
+  }
+
+  .message {
+    max-width: 91%;
+  }
+
+  .welcome h2 {
+    font-size: 25px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo">O</div>
+<header>
+  <div class="logo">
+    <img src="/ozen.png" alt="OZEN">
+  </div>
 
-    <div class="brand">
-      <strong>OZEN</strong>
-      <small>
-        <span class="online-dot"></span>
-        Sua inteligência pessoal
-      </small>
-    </div>
+  <div class="header-info">
+    <h1>OZEN</h1>
+    <div class="status">Online</div>
+  </div>
+</header>
 
-    <div class="header-tag">AI ASSISTANT</div>
-  </header>
+<main id="messages">
+  <div class="welcome" id="welcome">
+    <h2>Olá, Enzo! 👋</h2>
+    <p>Sou a OZEN. Estou aqui para conversar,<br>
+    ajudar e acompanhar suas ideias.</p>
+  </div>
 
-  <main id="messages">
+  <div class="typing" id="typing">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</main>
 
-    <div class="welcome">
-      <div class="welcome-icon">O</div>
-      <strong>OZEN INTELLIGENCE</strong>
-      <p>Seu espaço pessoal de inteligência.</p>
-    </div>
-
-    <div class="message bot">
-      <span class="message-label">OZEN</span>
-      Olá, Enzo! 💙 Sou a OZEN. Estou pronta para ajudar você. O que vamos fazer hoje?
-    </div>
-
-  </main>
-
-  <footer>
+<footer>
+  <div class="input-area">
     <input
-      id="messageInput"
+      id="userInput"
+      type="text"
       placeholder="Converse com a OZEN..."
       autocomplete="off"
     >
 
-    <button id="sendButton" aria-label="Enviar mensagem">
-      <svg viewBox="0 0 24 24">
-        <path d="M22 2L11 13"></path>
-        <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-      </svg>
-    </button>
-  </footer>
-
-  <div class="footer-note">
-    OZEN AI • Sua inteligência pessoal
+    <button id="sendButton" onclick="sendMessage()">➤</button>
   </div>
 
-  <script>
-    (async function protegerPagina() {
-      try {
-        const resposta = await fetch("/api/session", {
-          cache: "no-store"
-        });
+  <div class="footer-note">
+    OZEN AI · Sua inteligência artificial pessoal
+  </div>
+</footer>
 
-        if (!resposta.ok) {
-          window.location.replace("/");
-          return;
-        }
-      } catch {
-        window.location.replace("/");
-      }
-    })();
+<script>
+const messages = document.getElementById("messages");
+const input = document.getElementById("userInput");
+const sendButton = document.getElementById("sendButton");
+const typing = document.getElementById("typing");
+const welcome = document.getElementById("welcome");
 
-    const messages = document.getElementById("messages");
-    const input = document.getElementById("messageInput");
-    const button = document.getElementById("sendButton");
-    const history = [];
+const history = [];
+let sending = false;
 
-    function addMessage(text, type) {
-      const div = document.createElement("div");
-      div.className = "message " + type;
+/* VERIFICAR LOGIN */
 
-      const label = document.createElement("span");
-      label.className = "message-label";
-      label.textContent = type === "user" ? "VOCÊ" : "OZEN";
+async function checkSession() {
+  try {
+    const response = await fetch("/api/session");
 
-      const content = document.createElement("span");
-      content.textContent = text;
-
-      div.appendChild(label);
-      div.appendChild(content);
-
-      messages.appendChild(div);
-      messages.scrollTop = messages.scrollHeight;
+    if (!response.ok) {
+      window.location.href = "/";
     }
+  } catch (error) {
+    window.location.href = "/";
+  }
+}
 
-    function showTyping() {
-      const div = document.createElement("div");
-      div.className = "typing";
-      div.id = "typingIndicator";
+checkSession();
 
-      for (let i = 0; i < 3; i++) {
-        div.appendChild(document.createElement("span"));
-      }
+/* ADICIONAR MENSAGEM */
 
-      messages.appendChild(div);
-      messages.scrollTop = messages.scrollHeight;
-    }
+function addMessage(text, type) {
+  if (welcome) {
+    welcome.style.display = "none";
+  }
 
-    function hideTyping() {
-      const typing = document.getElementById("typingIndicator");
-      if (typing) typing.remove();
-    }
+  const container = document.createElement("div");
+  container.className = "message " + type;
 
-    async function sendMessage() {
-      const message = input.value.trim();
+  const label = document.createElement("div");
+  label.className = "message-label";
+  label.textContent = type === "user" ? "VOCÊ" : "OZEN";
 
-      if (!message || button.disabled) return;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
 
-      addMessage(message, "user");
-      input.value = "";
-      history.push({ role: "user", text: message });
+  container.appendChild(label);
+  container.appendChild(bubble);
 
-      button.disabled = true;
-      showTyping();
+  messages.insertBefore(container, typing);
+  messages.scrollTop = messages.scrollHeight;
+}
 
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message,
-            history: history.slice(0, -1)
-          })
-        });
+/* ENVIAR MENSAGEM */
 
-        const data = await response.json();
+async function sendMessage() {
+  const message = input.value.trim();
 
-        if (!response.ok) {
-          throw new Error(data.error || "Não consegui responder.");
-        }
+  if (!message || sending) return;
 
-        hideTyping();
+  sending = true;
+  sendButton.disabled = true;
 
-        addMessage(data.answer, "bot");
-        history.push({ role: "model", text: data.answer });
+  addMessage(message, "user");
 
-      } catch (error) {
-        hideTyping();
-        addMessage(error.message || "Erro de conexão.", "bot");
-        history.pop();
-      } finally {
-        button.disabled = false;
-        input.focus();
-      }
-    }
+  input.value = "";
+  typing.style.display = "flex";
+  messages.scrollTop = messages.scrollHeight;
 
-    button.addEventListener("click", sendMessage);
-
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        sendMessage();
-      }
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: message,
+        history: history
+      })
     });
-  </script>
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Não consegui responder agora.");
+    }
+
+    const answer = data.answer || data.reply || data.response;
+
+    if (!answer) {
+      throw new Error("A OZEN não retornou uma resposta.");
+    }
+
+    history.push({
+      role: "user",
+      text: message
+    });
+
+    history.push({
+      role: "model",
+      text: answer
+    });
+
+    addMessage(answer, "ozen");
+
+  } catch (error) {
+    addMessage(
+      "Desculpe, Enzo. Tive um problema ao responder. Tente novamente daqui a pouco.",
+      "ozen"
+    );
+
+    console.error(error);
+
+  } finally {
+    typing.style.display = "none";
+    sending = false;
+    sendButton.disabled = false;
+    input.focus();
+  }
+}
+
+/* ENVIAR COM ENTER */
+
+input.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+});
+</script>
 
 </body>
 </html>
