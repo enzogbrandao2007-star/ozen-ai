@@ -18,7 +18,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -33,7 +35,7 @@ body {
   isolation: isolate;
 }
 
-/* VÍDEO DE FUNDO IGUAL AO LOGIN */
+/* VÍDEO DE FUNDO */
 
 #backgroundVideo {
   position: fixed;
@@ -45,29 +47,20 @@ body {
   pointer-events: none;
 }
 
+/* SEM CAMADA SOBRE O VÍDEO */
+
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(
-    145deg,
-    rgba(3, 9, 22, .78),
-    rgba(5, 18, 40, .72),
-    rgba(3, 9, 22, .84)
-  );
-  z-index: -1;
-  pointer-events: none;
+  display: none;
 }
 
 header {
-  height: 76px;
+  min-height: 76px;
   padding: 0 20px;
   display: flex;
   align-items: center;
   gap: 13px;
   border-bottom: 1px solid rgba(100,160,255,.13);
-  background: rgba(5,13,29,.48);
-  backdrop-filter: blur(18px);
+  background: transparent;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -100,6 +93,7 @@ header {
   font-size: 19px;
   margin: 0;
   letter-spacing: 1px;
+  text-shadow: 0 2px 8px #000;
 }
 
 .status {
@@ -108,6 +102,7 @@ header {
   display: flex;
   align-items: center;
   gap: 6px;
+  text-shadow: 0 2px 5px #000;
 }
 
 .status::before {
@@ -144,12 +139,14 @@ header {
   background: linear-gradient(90deg, #fff, #58b5ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,.7));
 }
 
 .welcome p {
-  color: #c0d1e9;
+  color: #fff;
   font-size: 14px;
   line-height: 1.6;
+  text-shadow: 0 2px 6px rgba(0,0,0,.9);
 }
 
 .message {
@@ -159,8 +156,13 @@ header {
   animation: appear .25s ease;
 }
 
-.message.user { align-self: flex-end; }
-.message.ozen { align-self: flex-start; }
+.message.user {
+  align-self: flex-end;
+}
+
+.message.ozen {
+  align-self: flex-start;
+}
 
 .message-label {
   font-size: 10px;
@@ -168,11 +170,12 @@ header {
   letter-spacing: 1px;
   color: #78baff;
   margin: 0 8px 7px;
+  text-shadow: 0 2px 5px #000;
 }
 
 .message.user .message-label {
   text-align: right;
-  color: #d0dcef;
+  color: #fff;
 }
 
 .bubble {
@@ -195,7 +198,7 @@ header {
   border: 1px solid rgba(91,151,231,.25);
   border-bottom-left-radius: 5px;
   color: #e5efff;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
 }
 
 .typing {
@@ -216,16 +219,20 @@ header {
   animation: bounce 1s infinite;
 }
 
-.typing span:nth-child(2) { animation-delay: .15s; }
-.typing span:nth-child(3) { animation-delay: .3s; }
+.typing span:nth-child(2) {
+  animation-delay: .15s;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: .3s;
+}
 
 footer {
   position: sticky;
   bottom: 0;
   padding: 15px 16px calc(15px + env(safe-area-inset-bottom));
-  background: rgba(5,13,29,.58);
+  background: transparent;
   border-top: 1px solid rgba(100,160,255,.13);
-  backdrop-filter: blur(18px);
 }
 
 .input-area {
@@ -258,7 +265,9 @@ footer {
   padding: 12px 0;
 }
 
-#userInput::placeholder { color: #a0b2ce; }
+#userInput::placeholder {
+  color: #a0b2ce;
+}
 
 #sendButton {
   width: 43px;
@@ -274,7 +283,9 @@ footer {
   transition: .2s;
 }
 
-#sendButton:active { transform: scale(.92); }
+#sendButton:active {
+  transform: scale(.92);
+}
 
 #sendButton:disabled {
   opacity: .5;
@@ -283,32 +294,61 @@ footer {
 
 .footer-note {
   text-align: center;
-  color: #a0b3d0;
+  color: #fff;
   font-size: 10px;
   margin-top: 10px;
+  text-shadow: 0 2px 5px #000;
 }
 
 @keyframes appear {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes bounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-5px); }
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-5px);
+  }
 }
 
 @media (max-width: 500px) {
-  header { height: 68px; padding: 0 15px; }
-  .logo { width: 43px; height: 43px; }
-  #messages { padding: 20px 13px; }
-  .message { max-width: 91%; }
-  .welcome h2 { font-size: 25px; }
+  header {
+    min-height: 68px;
+    padding: 0 15px;
+  }
+
+  .logo {
+    width: 43px;
+    height: 43px;
+  }
+
+  #messages {
+    padding: 20px 13px;
+  }
+
+  .message {
+    max-width: 91%;
+  }
+
+  .welcome h2 {
+    font-size: 25px;
+  }
 }
 </style>
 </head>
 
 <body>
+
+<!-- VÍDEO ORIGINAL DO LOGIN -->
 
 <video id="backgroundVideo" autoplay muted loop playsinline>
   <source src="/fundo2.mp4" type="video/mp4">
@@ -328,8 +368,10 @@ footer {
 <main id="messages">
   <div class="welcome" id="welcome">
     <h2>Olá, Enzo! 👋</h2>
-    <p>Sou a OZEN. Estou aqui para conversar,<br>
-    ajudar e acompanhar suas ideias.</p>
+    <p>
+      Sou a OZEN. Estou aqui para conversar,<br>
+      ajudar e acompanhar suas ideias.
+    </p>
   </div>
 
   <div class="typing" id="typing">
