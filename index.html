@@ -5,69 +5,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OZEN AI</title>
-  .video-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: -1;
-  pointer-events: none;
-}
 
-body {
-  position: relative;
-  isolation: isolate;
-  background: #06152b;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 10, 28, 0.50);
-  z-index: -1;
-  pointer-events: none;
-}
-
-.login {
-  position: relative;
-  z-index: 1;
-}<style>
-    * { box-sizing: border-box; }
-
-    body {
-  margin: 0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  isolation: isolate;
-  background: #06152b;
-  font-family: Arial, sans-serif;
-  color: white;
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      isolation: isolate;
+      background: #06152b;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    /* Vídeo ocupando a tela inteira */
+    .video-background {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* Camada escura sobre o vídeo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 10, 28, 0.50);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Cartão de login centralizado */
     .login {
-  position: relative;
-  z-index: 1;
-  width: 90%;
-  max-width: 380px;
-  margin: auto;
-  padding: 35px 25px;
-  text-align: center;
-  background: rgba(7, 22, 48, 0.82);
-  border: 1px solid rgba(120,190,255,.25);
-  border-radius: 25px;
-  box-shadow: 0 20px 60px #0007;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 380px;
+      margin: auto;
+      padding: 35px 25px;
+      text-align: center;
+      background: rgba(7, 22, 48, 0.82);
+      border: 1px solid rgba(120,190,255,.25);
+      border-radius: 25px;
+      box-shadow: 0 20px 60px #0007;
     }
 
     .avatar {
       width: 105px;
       height: 105px;
-      margin: auto auto 20px;
+      margin: 0 auto 20px;
       border-radius: 50%;
       border: 3px solid #48baff;
       display: flex;
@@ -84,8 +82,15 @@ body::before {
       object-fit: cover;
     }
 
-    h1 { margin: 8px 0; font-size: 30px; }
-    .sub { color: #b6d9ff; margin-bottom: 28px; }
+    h1 {
+      margin: 8px 0;
+      font-size: 30px;
+    }
+
+    .sub {
+      color: #b6d9ff;
+      margin-bottom: 28px;
+    }
 
     input {
       width: 100%;
@@ -113,9 +118,14 @@ body::before {
       cursor: pointer;
     }
 
-    #status { min-height: 22px; margin-top: 17px; color: #ffaaaa; }
+    #status {
+      min-height: 22px;
+      margin-top: 17px;
+      color: #ffaaaa;
+    }
   </style>
 </head>
+
 <body>
 
   <video class="video-background" autoplay muted loop playsinline>
@@ -123,9 +133,11 @@ body::before {
   </video>
 
   <main class="login">
+
     <div class="avatar">
-  <img src="/enzo.jpg" alt="Foto de Enzo">
+      <img src="/enzo.jpg" alt="Foto de Enzo">
     </div>
+
     <h1>Bem-vindo, Enzo!</h1>
     <p class="sub">Sua inteligência pessoal está esperando.</p>
 
@@ -144,6 +156,7 @@ body::before {
     </form>
 
     <p id="status"></p>
+
   </main>
 
   <script>
@@ -179,5 +192,6 @@ body::before {
       }
     });
   </script>
+
 </body>
 </html>
